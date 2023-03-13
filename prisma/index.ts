@@ -1,25 +1,46 @@
 import { PrismaClient } from '@prisma/client'
+import { create } from 'domain'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  // TODO ここに処理を記載する
-  // const alice = await prisma.user.findUnique({
-  //   where: { email: 'alice@example.com' }
+  // 自動トランザクション
+  // const addUser = await prisma.user.create({
+  //   data: {
+  //     name: 'joy',
+  //     email: 'joy@enjoy.com',
+  //     profile: {
+  //       create: {
+  //         bio: 'yarn create vite',
+  //       }
+  //     }
+  //   }
   // })
 
-  // console.log(alice)
+  // console.log(addUser)
 
-  // const users = await prisma.user.findMany()
+  // 手動トランザクション
+  const [user, post, totalPosts] = await prisma.$transaction([
+    prisma.user.create({
+      data: {
+        name: 'mike',
+        email: 'mike@example.com',
+        profile: {
+            create: {
+                bio: 'I like turtles',
+            }
+        }
+      }
+    }),
+    prisma.post.create({
+      data: {
+        title: 'sample post'
+      }
+    }),
+    prisma.post.count(),
+  ])
 
-  // console.log(users)
-
-  const bob = await prisma.user.findUnique({
-    where: {email: 'bob@example.com'},
-    include: { posts: true }
-  })
-
-  console.log(bob)
+  console.log(user, post, totalPosts)
 }
 
 main()

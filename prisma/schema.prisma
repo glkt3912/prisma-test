@@ -15,6 +15,7 @@ model User {
   name    String
   tel    String? @db.VarChar(11)
   posts   Post[]
+  profile Profile?
 }
 model Post {
   id        Int     @id @default(autoincrement())
@@ -23,4 +24,11 @@ model Post {
   published Boolean @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
+}
+
+model Profile {
+  id     Int     @default(autoincrement()) @id
+  bio    String?
+  user   User    @relation(fields: [userId], references: [id]) // fields: [userId] = Profile.userId, references: [User.id]
+  userId Int     @unique
 }
